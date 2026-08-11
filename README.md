@@ -1,0 +1,1 @@
+# INTUITY-BEGINNER-spelling-A1
