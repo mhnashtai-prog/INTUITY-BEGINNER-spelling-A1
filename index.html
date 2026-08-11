@@ -3,7 +3,890 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>INTUITY - Verbs & Emojis<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>INTUITY - Verbs & Emojis</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    background: #0d0d0d;
+    color: white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  .background {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 169, 97, 0.18) 0%, transparent 40%),
+                radial-gradient(circle at 70% 80%, rgba(201, 169, 97, 0.16) 0%, transparent 38%),
+                radial-gradient(circle at 20% 70%, rgba(201, 169, 97, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 15%, rgba(201, 169, 97, 0.14) 0%, transparent 35%),
+                #0d0d0d;
+    z-index: 0; overflow: hidden;
+  }
+
+  .elegant-curves { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  .curve-elegant { position: absolute; border-radius: 50%; filter: blur(2px); }
+
+  .curve-elegant-1 {
+    width: 500px; height: 900px; top: -300px; right: -150px;
+    border: 3px solid rgba(201, 169, 97, 0.35);
+    background: linear-gradient(135deg, rgba(201, 169, 97, 0.15) 0%, rgba(201, 169, 97, 0.08) 50%, transparent 100%);
+    transform: rotate(25deg);
+    animation: floatElegant 12s ease-in-out infinite;
+    box-shadow: inset 0 0 60px rgba(201, 169, 97, 0.1), 0 0 80px rgba(201, 169, 97, 0.15);
+    --base-rotation: 25deg;
+  }
+
+  .curve-elegant-2 {
+    width: 600px; height: 1100px; bottom: -400px; left: -200px;
+    border: 2.5px solid rgba(201, 169, 97, 0.32);
+    background: linear-gradient(135deg, rgba(201, 169, 97, 0.12) 0%, rgba(201, 169, 97, 0.06) 40%, transparent 80%);
+    transform: rotate(-20deg);
+    animation: floatElegant 15s ease-in-out infinite reverse;
+    box-shadow: inset 0 0 50px rgba(201, 169, 97, 0.08), 0 0 70px rgba(201, 169, 97, 0.12);
+    --base-rotation: -20deg;
+  }
+
+  @keyframes floatElegant {
+    0%, 100% { transform: translateY(0) rotate(var(--base-rotation, 0deg)); opacity: 1; }
+    50% { transform: translateY(-30px) rotate(calc(var(--base-rotation, 0deg) + 3deg)); opacity: 0.85; }
+  }
+
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.01'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1;
+  }
+
+  .container { max-width: 500px; margin: 0 auto; position: relative; z-index: 2; padding: 0 1rem 2rem; }
+
+  .header { text-align: center; margin-bottom: 1.5rem; padding: 1rem 0 0.75rem; }
+
+  .header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem; font-weight: 700; color: #C9A961;
+    margin-bottom: 0.375rem; letter-spacing: -0.04em; text-transform: uppercase;
+    background: linear-gradient(135deg, #C9A961 0%, rgba(201, 169, 97, 0.8) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .header .subtitle { font-size: 0.75rem; color: #8e8e93; margin-bottom: 0.25rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .header .author { font-size: 0.6875rem; color: #636366; margin-bottom: 0.5rem; font-weight: 400; letter-spacing: 0.02em; }
+
+  /* ---------- screens ---------- */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ---------- loading / error states ---------- */
+  .state-message {
+    text-align: center; padding: 3rem 1.5rem; color: #8e8e93;
+    display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+  }
+  .state-message .state-emoji { font-size: 2rem; }
+  .state-message .state-title { color: #C9A961; font-weight: 700; font-size: 0.9375rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .state-message .state-detail { font-size: 0.8125rem; max-width: 320px; line-height: 1.5; }
+  .state-message .retry-button {
+    margin-top: 0.5rem; background: rgba(201, 169, 97, 0.12); border: 1px solid rgba(201, 169, 97, 0.4);
+    color: #C9A961; padding: 0.625rem 1.25rem; border-radius: 0.75rem; font-weight: 600;
+    font-size: 0.8125rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em;
+    transition: all 0.25s ease;
+  }
+  .state-message .retry-button:hover { background: rgba(201, 169, 97, 0.2); transform: translateY(-1px); }
+  .spinner {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid rgba(201, 169, 97, 0.2); border-top-color: #C9A961;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- home topic grid ---------- */
+  .topics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.875rem; padding: 0 0.5rem; margin-top: 1rem; }
+
+  .topic-card {
+    background: #000000; border-radius: 1.25rem; padding: 1.25rem 0.875rem;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    gap: 0.5rem; min-height: 135px; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(84, 84, 88, 0.25);
+  }
+  .topic-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(201, 169, 97, 0.2), 0 0 0 1px rgba(201, 169, 97, 0.3);
+    border-color: rgba(201, 169, 97, 0.4);
+  }
+  .topic-card .topic-emoji { font-size: 1.875rem; line-height: 1; }
+  .topic-card .topic-label { font-size: 0.875rem; font-weight: 700; color: #C9A961; text-transform: uppercase; letter-spacing: 0.06em; }
+  .topic-card .topic-count { font-size: 0.625rem; color: #636366; letter-spacing: 0.03em; }
+
+  /* ---------- topic screen header ---------- */
+  .topic-header { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 0 0.5rem; }
+
+  .back-button {
+    width: 2.25rem; height: 2.25rem; border-radius: 50%;
+    background: rgba(28, 28, 30, 0.8); border: 1px solid rgba(84, 84, 88, 0.35);
+    color: #C9A961; font-size: 1.25rem; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.25s ease; flex-shrink: 0;
+  }
+  .back-button:hover { background: rgba(201, 169, 97, 0.15); border-color: rgba(201, 169, 97, 0.5); transform: translateX(-2px); }
+
+  .topic-title-block { flex: 1; text-align: center; }
+  .topic-title-block h2 {
+    font-family: 'Space Grotesk', sans-serif; font-size: 1.375rem; font-weight: 700; color: #C9A961;
+    text-transform: uppercase; letter-spacing: -0.01em;
+  }
+  .header-spacer { width: 2.25rem; flex-shrink: 0; }
+
+  .progress-indicator { text-align: center; font-size: 0.75rem; color: #636366; margin: 0.5rem 0 1.25rem; font-weight: 600; letter-spacing: 0.05em; }
+
+  /* ---------- drill grid ---------- */
+  .verbs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.875rem; padding: 0 0.5rem; margin-bottom: 1.75rem; }
+
+  .verb-card {
+    background: #000000; border-radius: 1.25rem; padding: 1.25rem 0.875rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.625rem;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(84, 84, 88, 0.25); position: relative; min-height: 145px;
+  }
+  .verb-card.correct { border-color: rgba(52, 199, 89, 0.5); box-shadow: 0 8px 32px rgba(52, 199, 89, 0.3); cursor: help; }
+  .verb-card.correct:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(52, 199, 89, 0.35); border-color: rgba(52, 199, 89, 0.6); }
+  .verb-card:hover:not(.correct) { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(201, 169, 97, 0.2), 0 0 0 1px rgba(201, 169, 97, 0.3); border-color: rgba(201, 169, 97, 0.4); }
+
+  .emoji-prompt { font-size: 2.25rem; line-height: 1; }
+
+  .letter-boxes { display: flex; gap: 0.25rem; flex-wrap: wrap; justify-content: center; }
+
+  .letter-box {
+    width: 26px; height: 36px; background: rgba(28, 28, 30, 0.6);
+    border: 1.5px solid rgba(84, 84, 88, 0.3); border-radius: 0.375rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.0625rem; font-weight: 600; color: #e5e5e7; text-transform: lowercase;
+    transition: all 0.2s ease; position: relative;
+  }
+
+  .letter-box.active-cursor { border-color: rgba(201, 169, 97, 0.6); background: rgba(201, 169, 97, 0.15); }
+  .letter-box.active-cursor::after {
+    content: ''; position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 18px; background: #C9A961; animation: cursorBlink 1s step-end infinite;
+  }
+  @keyframes cursorBlink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+  .letter-box.just-inserted { animation: letterPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes letterPop {
+    0% { transform: scale(0.8) translateY(-5px); opacity: 0; }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .letter-box.peeking { background: rgba(201, 169, 97, 0.3); border-color: rgba(201, 169, 97, 0.6); color: #C9A961; animation: peekPulse 0.3s ease; }
+  @keyframes peekPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+  .letter-box.filled { background: rgba(201, 169, 97, 0.2); border-color: rgba(201, 169, 97, 0.5); color: #C9A961; }
+  .letter-box.correct { background: rgba(52, 199, 89, 0.2); border-color: rgba(52, 199, 89, 0.6); color: #34c759; }
+  .letter-box.wrong { background: rgba(255, 92, 92, 0.16); border-color: rgba(255, 92, 92, 0.55); color: #ff8080; animation: wrongPulse 0.35s ease; }
+  @keyframes wrongPulse { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+  @keyframes gentleShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-5px); } 40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); } 80% { transform: translateX(3px); }
+  }
+  .card-modal.wrong-shake, .verb-card.wrong-shake { animation: gentleShake 0.4s ease; }
+
+  .modal-wrong-mark {
+    font-size: 2.5rem; color: #ff5c5c; opacity: 0; transform: scale(0);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); margin-bottom: 0; height: 0; pointer-events: none;
+  }
+  .modal-wrong-mark.show { opacity: 1; transform: scale(1); height: auto; margin-bottom: 0.5rem; }
+
+  .check-mark { position: absolute; top: 0.625rem; right: 0.625rem; font-size: 1.375rem; opacity: 0; transform: scale(0); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .verb-card.correct .check-mark { opacity: 1; transform: scale(1); }
+
+  .hidden-input { position: absolute; opacity: 0; pointer-events: none; }
+
+  .icons-row { display: flex; gap: 0.5rem; margin-top: 0.375rem; }
+  .peek-icon, .reset-icon { font-size: 1rem; color: #8e8e93; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+  .peek-icon:hover { color: #C9A961; transform: scale(1.15); }
+  .reset-icon:hover { color: #fb923c; transform: scale(1.15) rotate(-45deg); }
+  .peek-icon:active, .reset-icon:active { transform: scale(0.95); }
+
+  /* ---------- navigation ---------- */
+  .navigation { display: flex; justify-content: space-between; align-items: center; padding: 0 0.5rem; margin-top: 1.5rem; gap: 0.75rem; }
+  .nav-button {
+    background: #000000; border: 1px solid rgba(84, 84, 88, 0.25); border-radius: 0.875rem;
+    padding: 0.75rem 1.5rem; color: #8e8e93; font-weight: 600; font-size: 0.8125rem; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.05em;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  .nav-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201, 169, 97, 0.3); border-color: rgba(201, 169, 97, 0.4); color: #C9A961; }
+  .nav-button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .dots-container { display: flex; gap: 0.5rem; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(84, 84, 88, 0.4); transition: all 0.3s ease; cursor: pointer; }
+  .dot:hover { background: rgba(201, 169, 97, 0.6); transform: scale(1.2); }
+  .dot.active { background: #C9A961; box-shadow: 0 0 12px rgba(201, 169, 97, 0.6); }
+
+  /* ---------- reveal modal ---------- */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+    z-index: 999; display: none; align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+
+  .cheat-modal {
+    background: rgba(28, 28, 30, 0.98); border: 2px solid rgba(201, 169, 97, 0.4); border-radius: 1.5rem;
+    padding: 2rem; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+    animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cheat-modal .cheat-emoji { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .cheat-modal .verb-infinitive { font-family: 'Space Grotesk', sans-serif; font-size: 2.25rem; font-weight: 700; color: #C9A961; text-transform: lowercase; letter-spacing: -0.02em; }
+
+  /* ---------- expanded card modal ---------- */
+  .card-modal-overlay {
+    align-items: flex-end; height: 100vh; height: 100dvh;
+    background: rgba(58, 52, 42, 0.82); backdrop-filter: blur(16px) saturate(140%);
+  }
+  @media (min-width: 560px) { .card-modal-overlay { align-items: center; } }
+
+  .card-modal {
+    background: #000000; border: 1px solid rgba(201, 169, 97, 0.3); border-radius: 1.5rem 1.5rem 0 0;
+    padding: 2.25rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom));
+    width: 100%; max-width: 440px; text-align: center;
+    box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.4);
+    position: relative; transform: translateY(30px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .card-modal-overlay.show .card-modal { transform: translateY(0); opacity: 1; }
+  @media (min-width: 560px) { .card-modal { border-radius: 1.5rem; padding: 2.5rem 2rem; } }
+
+  .card-modal.correct { border-color: rgba(52, 199, 89, 0.5); box-shadow: 0 -10px 60px rgba(52, 199, 89, 0.25), 0 0 0 1px rgba(52, 199, 89, 0.3); }
+
+  .card-modal-close {
+    position: absolute; top: 1rem; right: 1rem; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+    background: rgba(99, 99, 102, 0.25); border: 1px solid rgba(99, 99, 102, 0.2); color: #8e8e93;
+    font-size: 1.375rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease; line-height: 1; z-index: 2;
+  }
+  .card-modal-close:hover { background: rgba(99, 99, 102, 0.35); color: #e5e5e7; transform: rotate(90deg); }
+
+  .card-modal-drag-handle { width: 36px; height: 4px; border-radius: 999px; background: rgba(142, 142, 147, 0.4); margin: 0 auto 1.5rem; }
+  @media (min-width: 560px) { .card-modal-drag-handle { display: none; } }
+
+  .card-modal .modal-check-mark { font-size: 2.5rem; opacity: 0; transform: scale(0); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-bottom: 0.5rem; height: 0; }
+  .card-modal.correct .modal-check-mark { opacity: 1; transform: scale(1); height: auto; margin-bottom: 0.75rem; }
+
+  .card-modal .modal-emoji-prompt { font-size: 4rem; line-height: 1; margin-bottom: 1.75rem; }
+
+  .card-modal .modal-letter-boxes { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.75rem; min-height: 64px; }
+  .card-modal .letter-box { width: 42px; height: 56px; font-size: 1.625rem; border-radius: 0.625rem; }
+  @media (max-width: 380px) { .card-modal .letter-box { width: 36px; height: 50px; font-size: 1.375rem; } }
+
+  .card-modal .icons-row { justify-content: center; gap: 1.5rem; position: relative; z-index: 2; }
+  .card-modal .peek-icon, .card-modal .reset-icon { font-size: 1.375rem; padding: 0.5rem; }
+
+  .modal-input {
+    position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0;
+    border: 0; background: transparent; cursor: text; caret-color: transparent; font-size: 16px;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 1.75rem; }
+    .header .subtitle { font-size: 0.6875rem; }
+    .header .author { font-size: 0.625rem; }
+    .container { padding: 0 0.75rem 2rem; }
+    .topics-grid { gap: 0.75rem; padding: 0 0.25rem; }
+    .topic-card { min-height: 120px; padding: 1rem 0.75rem; border-radius: 1rem; }
+    .verbs-grid { gap: 0.75rem; padding: 0 0.25rem; margin-bottom: 1.5rem; }
+    .verb-card { padding: 1rem 0.75rem; min-height: 130px; border-radius: 1rem; }
+    .emoji-prompt { font-size: 1.875rem; }
+    .letter-boxes { gap: 0.2rem; }
+    .letter-box { width: 24px; height: 34px; font-size: 1rem; }
+    .peek-icon { font-size: 0.9375rem; }
+    .check-mark { font-size: 1.25rem; top: 0.5rem; right: 0.5rem; }
+    .navigation { margin-top: 1.25rem; padding: 0 0.25rem; gap: 0.5rem; }
+    .nav-button { padding: 0.625rem 1.25rem; font-size: 0.75rem; border-radius: 0.75rem; }
+    .dots-container { gap: 0.375rem; }
+    .dot { width: 7px; height: 7px; }
+    .progress-indicator { font-size: 0.6875rem; margin-bottom: 1rem; }
+  }
+
+  @media (max-width: 380px) {
+    .header h1 { font-size: 1.5rem; }
+    .verb-card { min-height: 120px; padding: 0.875rem 0.625rem; }
+    .letter-box { width: 22px; height: 32px; font-size: 0.9375rem; }
+    .nav-button { padding: 0.5rem 1rem; font-size: 0.6875rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="background">
+  <div class="elegant-curves">
+    <div class="curve-elegant curve-elegant-1"></div>
+    <div class="curve-elegant curve-elegant-2"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cheatOverlay">
+  <div class="cheat-modal">
+    <div class="cheat-emoji" id="cheatEmoji"></div>
+    <div class="verb-infinitive" id="cheatVerb"></div>
+  </div>
+</div>
+
+<div class="modal-overlay card-modal-overlay" id="cardModalOverlay">
+  <div class="card-modal" id="cardModal" onclick="focusModalInput()">
+    <button class="card-modal-close" onclick="event.stopPropagation(); closeCardModal()">×</button>
+    <div class="card-modal-drag-handle"></div>
+    <div class="modal-check-mark" id="modalCheckMark">✓</div>
+    <div class="modal-wrong-mark" id="modalWrongMark">✗</div>
+    <div class="modal-emoji-prompt" id="modalEmojiPrompt"></div>
+    <div class="modal-letter-boxes" id="modalLetterBoxes"></div>
+    <div class="icons-row" id="modalIconsRow">
+      <div class="peek-icon" onclick="peekModal(event)">👁</div>
+      <div class="reset-icon" onclick="resetModalAttempt(event)">↺</div>
+    </div>
+    <input type="text" class="modal-input" id="modalInput"
+           autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+           inputmode="text" enterkeyhint="done"
+           oninput="handleModalInput(event)">
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>INTUITY</h1>
+    <p class="subtitle">Intuitive & Immersive Learning</p>
+    <p class="author">Majid Nashtai</p>
+  </div>
+
+  <!-- ================= HOME SCREEN ================= -->
+  <div class="screen active" id="homeScreen">
+    <div id="homeState"></div>
+    <div class="topics-grid" id="topicsGrid"></div>
+  </div>
+
+  <!-- ================= TOPIC SCREEN ================= -->
+  <div class="screen" id="topicScreen">
+    <div class="topic-header">
+      <div class="back-button" onclick="goHome()">←</div>
+      <div class="topic-title-block"><h2 id="topicTitle"></h2></div>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="progress-indicator">SET <span id="currentSet">1</span> OF <span id="totalSets">1</span></div>
+
+    <div class="verbs-grid" id="verbsGrid"></div>
+
+    <div class="navigation">
+      <button class="nav-button" id="prevBtn" onclick="previousSet()">← Previous</button>
+      <div class="dots-container" id="dotsContainer"></div>
+      <button class="nav-button" id="nextBtn" onclick="nextSet()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     DATA SOURCE
+     All topics/words/emojis live in an external JSON file
+     (data.json) that sits next to this HTML file, so the deck
+     can be extended for much more practice just by editing that
+     file — no code changes needed.
+  ============================================================ */
+  const DATA_URL = './data.json';
+
+  let topicData = {};
+  let topicOrder = [];
+  const SET_SIZE = 4; // 2x2 per slide
+
+  async function loadData() {
+    renderHomeState('loading');
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      topicData = json.topics || {};
+      topicOrder = json.topicOrder || Object.keys(topicData);
+      renderHomeState('ready');
+      renderHome();
+    } catch (err) {
+      console.error('Failed to load data.json', err);
+      renderHomeState('error');
+    }
+  }
+
+  function renderHomeState(state) {
+    const el = document.getElementById('homeState');
+    const grid = document.getElementById('topicsGrid');
+    if (state === 'loading') {
+      grid.innerHTML = '';
+      el.innerHTML = `
+        <div class="state-message">
+          <div class="spinner"></div>
+          <div class="state-title">Loading topics…</div>
+        </div>`;
+    } else if (state === 'error') {
+      grid.innerHTML = '';
+      el.innerHTML = `
+        <div class="state-message">
+          <div class="state-emoji">⚠️</div>
+          <div class="state-title">Couldn't load data.json</div>
+          <div class="state-detail">Make sure data.json is in the same folder as this file, and open this page through a local server (not directly as a file://) so the browser allows the fetch.</div>
+          <button class="retry-button" onclick="loadData()">Retry</button>
+        </div>`;
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  /* ============================================================
+     STATE
+  ============================================================ */
+  let activeTopicId = null;
+  let currentSetIndex = 0;
+  let userAnswers = {};
+  let currentFocusedInput = null;
+  let activeModalCard = null; // { idx }
+
+  /* ============================================================
+     HOME SCREEN
+  ============================================================ */
+  function renderHome() {
+    const grid = document.getElementById('topicsGrid');
+    grid.innerHTML = '';
+    topicOrder.forEach(id => {
+      const t = topicData[id];
+      if (!t) return;
+      const card = document.createElement('div');
+      card.className = 'topic-card';
+      card.innerHTML = `
+        <div class="topic-emoji">${t.emoji}</div>
+        <div class="topic-label">${t.label}</div>
+        <div class="topic-count">${t.items.length} examples</div>
+      `;
+      card.onclick = () => openTopic(id);
+      grid.appendChild(card);
+    });
+  }
+
+  function goHome() {
+    activeTopicId = null;
+    currentFocusedInput = null;
+    document.getElementById('homeScreen').classList.add('active');
+    document.getElementById('topicScreen').classList.remove('active');
+  }
+
+  function openTopic(id) {
+    activeTopicId = id;
+    currentSetIndex = 0;
+    document.getElementById('homeScreen').classList.remove('active');
+    document.getElementById('topicScreen').classList.add('active');
+    document.getElementById('topicTitle').textContent = topicData[id].label;
+    createDots();
+    renderSet();
+  }
+
+  /* ============================================================
+     SETS / PAGINATION
+  ============================================================ */
+  function getItems() { return topicData[activeTopicId].items; }
+  function getSets() {
+    const items = getItems();
+    const sets = [];
+    for (let i = 0; i < items.length; i += SET_SIZE) sets.push(items.slice(i, i + SET_SIZE));
+    return sets;
+  }
+  function getSetOffset(setIdx) { return setIdx * SET_SIZE; }
+
+  function createDots() {
+    const container = document.getElementById('dotsContainer');
+    container.innerHTML = '';
+    const sets = getSets();
+    document.getElementById('totalSets').textContent = sets.length;
+    for (let i = 0; i < sets.length; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === currentSetIndex ? ' active' : '');
+      dot.onclick = () => goToSet(i);
+      container.appendChild(dot);
+    }
+  }
+
+  function renderSet() {
+    const grid = document.getElementById('verbsGrid');
+    grid.innerHTML = '';
+
+    const sets = getSets();
+    const setItems = sets[currentSetIndex];
+    const offset = getSetOffset(currentSetIndex);
+
+    setItems.forEach((item, i) => {
+      const idx = offset + i;
+      const key = `${activeTopicId}-${idx}`;
+      const userAnswer = userAnswers[key] || '';
+      const isCorrect = userAnswer.toLowerCase() === item.word.toLowerCase();
+
+      const card = document.createElement('div');
+      card.className = 'verb-card' + (isCorrect ? ' correct' : '');
+      card.id = `card-${idx}`;
+
+      card.innerHTML = `
+        <span class="check-mark">✓</span>
+        <div class="emoji-prompt">${item.emoji}</div>
+        <div class="letter-boxes" id="letters-${idx}">
+          ${generateLetterBoxes(item.word, userAnswer, isCorrect, -1, false)}
+        </div>
+        <div class="icons-row">
+          <div class="peek-icon" onclick="peekCard(event, ${idx})">👁</div>
+          <div class="reset-icon" onclick="resetCard(event, ${idx})">↺</div>
+        </div>
+        <input type="text" class="hidden-input" id="input-${idx}"
+               maxlength="${item.word.length}" value="${userAnswer}"
+               oninput="handleInputInline(event, ${idx})"
+               onfocus="setFocusedCard(${idx})"
+               onblur="removeFocusedCard(${idx})">
+      `;
+
+      card.onclick = () => { if (!isCorrect) openCardModal(idx); else showCheat(item); };
+
+      grid.appendChild(card);
+    });
+
+    document.getElementById('currentSet').textContent = currentSetIndex + 1;
+    updateNavButtons();
+    updateDots();
+  }
+
+  function handleInputInline(e, idx) { handleInput(e, idx, getItems()[idx].word); }
+
+  function setFocusedCard(idx) { currentFocusedInput = idx; refreshVisibleLetterBoxes(); }
+  function removeFocusedCard(idx) { currentFocusedInput = null; refreshVisibleLetterBoxes(); }
+
+  function refreshVisibleLetterBoxes() {
+    const sets = getSets();
+    const setItems = sets[currentSetIndex];
+    const offset = getSetOffset(currentSetIndex);
+    setItems.forEach((item, i) => {
+      const idx = offset + i;
+      const key = `${activeTopicId}-${idx}`;
+      const userAnswer = userAnswers[key] || '';
+      const isCorrect = userAnswer.toLowerCase() === item.word.toLowerCase();
+      const isFocused = currentFocusedInput === idx;
+      const box = document.getElementById(`letters-${idx}`);
+      if (box) box.innerHTML = generateLetterBoxes(item.word, userAnswer, isCorrect, -1, isFocused);
+    });
+  }
+
+  function generateLetterBoxes(word, userAnswer, isCorrect, lastInsertedIndex = -1, isFocused = false, isWrong = false) {
+    const currentPosition = userAnswer.length;
+    return word.split('').map((letter, i) => {
+      const userLetter = userAnswer[i] || '';
+      let classes = isCorrect ? 'letter-box correct' : (isWrong ? 'letter-box wrong' : (userLetter ? 'letter-box filled' : 'letter-box'));
+      if (i === lastInsertedIndex) classes += ' just-inserted';
+      if (isFocused && !isCorrect && !userLetter && i === currentPosition) classes += ' active-cursor';
+      return `<div class="${classes}">${userLetter}</div>`;
+    }).join('');
+  }
+
+  function resetCard(event, idx) {
+    event.stopPropagation();
+    const key = `${activeTopicId}-${idx}`;
+    delete userAnswers[key];
+    const card = document.getElementById(`card-${idx}`);
+    if (card) card.classList.remove('correct');
+    const item = getItems()[idx];
+    const box = document.getElementById(`letters-${idx}`);
+    if (box) box.innerHTML = generateLetterBoxes(item.word, '', false, -1, false);
+    const input = document.getElementById(`input-${idx}`);
+    if (input) input.value = '';
+  }
+
+  function peekCard(event, idx) {
+    event.stopPropagation();
+    const item = getItems()[idx];
+    const boxes = document.querySelectorAll(`#letters-${idx} .letter-box`);
+    const peekIcon = event.target;
+
+    boxes.forEach((box, i) => { box.textContent = item.word[i]; box.classList.add('peeking'); });
+    peekIcon.style.opacity = '0';
+
+    setTimeout(() => {
+      const key = `${activeTopicId}-${idx}`;
+      const userAnswer = userAnswers[key] || '';
+      boxes.forEach((box, i) => { box.textContent = userAnswer[i] || ''; box.classList.remove('peeking'); });
+      peekIcon.style.opacity = '1';
+    }, 1500);
+  }
+
+  function handleInput(e, idx, correctAnswer) {
+    const value = e.target.value.toLowerCase();
+    const key = `${activeTopicId}-${idx}`;
+    const previousValue = userAnswers[key] || '';
+    userAnswers[key] = value;
+
+    let lastInsertedIndex = -1;
+    if (value.length > previousValue.length) lastInsertedIndex = value.length - 1;
+
+    const isCorrect = value === correctAnswer.toLowerCase();
+    const isFullyTypedWrong = !isCorrect && value.length > 0 && value.length === correctAnswer.length;
+    const isFocused = currentFocusedInput === idx;
+
+    const box = document.getElementById(`letters-${idx}`);
+    if (box) box.innerHTML = generateLetterBoxes(correctAnswer, value, isCorrect, lastInsertedIndex, isFocused, isFullyTypedWrong);
+
+    if (isCorrect) {
+      const card = document.getElementById(`card-${idx}`);
+      card.classList.add('correct');
+      currentFocusedInput = null;
+      setTimeout(() => e.target.blur(), 300);
+      return;
+    }
+
+    if (isFullyTypedWrong) {
+      const card = document.getElementById(`card-${idx}`);
+      if (card) card.classList.add('wrong-shake');
+      playGentleWrongSound();
+      setTimeout(() => {
+        if (card) card.classList.remove('wrong-shake');
+        if (userAnswers[key] === value) {
+          userAnswers[key] = '';
+          e.target.value = '';
+          const lb = document.getElementById(`letters-${idx}`);
+          if (lb) lb.innerHTML = generateLetterBoxes(correctAnswer, '', false, -1, isFocused);
+        }
+      }, 650);
+    }
+  }
+
+  /* ---- expanded card modal ---- */
+  function syncCardModalViewport() {
+    const overlay = document.getElementById('cardModalOverlay');
+    if (!overlay || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    overlay.style.top = vv.offsetTop + 'px';
+    overlay.style.height = vv.height + 'px';
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncCardModalViewport);
+    window.visualViewport.addEventListener('scroll', syncCardModalViewport);
+  }
+
+  function openCardModal(idx) {
+    activeModalCard = { idx };
+    renderModalContent();
+    const overlay = document.getElementById('cardModalOverlay');
+    overlay.classList.add('show');
+    syncCardModalViewport();
+    const input = document.getElementById('modalInput');
+    input.focus({ preventScroll: true });
+    let syncCount = 0;
+    const settleInterval = setInterval(() => {
+      syncCardModalViewport();
+      syncCount++;
+      if (syncCount > 10) clearInterval(settleInterval);
+    }, 50);
+  }
+
+  function focusModalInput() {
+    if (!activeModalCard) return;
+    const { idx } = activeModalCard;
+    const item = getItems()[idx];
+    const key = `${activeTopicId}-${idx}`;
+    const userAnswer = userAnswers[key] || '';
+    if (userAnswer.toLowerCase() === item.word.toLowerCase()) return;
+    const input = document.getElementById('modalInput');
+    if (input) input.focus({ preventScroll: true });
+  }
+
+  function closeCardModal() {
+    const overlay = document.getElementById('cardModalOverlay');
+    overlay.classList.remove('show');
+    overlay.style.top = '';
+    overlay.style.height = '';
+    document.getElementById('modalInput').blur();
+    activeModalCard = null;
+    currentFocusedInput = null;
+    renderSet();
+  }
+
+  function renderModalContent() {
+    if (!activeModalCard) return;
+    const { idx } = activeModalCard;
+    const item = getItems()[idx];
+    const key = `${activeTopicId}-${idx}`;
+    const userAnswer = userAnswers[key] || '';
+    const isCorrect = userAnswer.toLowerCase() === item.word.toLowerCase();
+
+    document.getElementById('modalEmojiPrompt').textContent = item.emoji;
+    document.getElementById('modalLetterBoxes').innerHTML = generateLetterBoxes(item.word, userAnswer, isCorrect, -1, true);
+    document.getElementById('cardModal').classList.toggle('correct', isCorrect);
+
+    const input = document.getElementById('modalInput');
+    input.maxLength = item.word.length;
+    input.value = userAnswer;
+  }
+
+  function playGentleWrongSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(340, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.2);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.09, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.28);
+      osc.onended = () => ctx.close();
+    } catch (err) { /* fail silently */ }
+  }
+
+  function handleModalInput(e) {
+    if (!activeModalCard) return;
+    const { idx } = activeModalCard;
+    const item = getItems()[idx];
+    const key = `${activeTopicId}-${idx}`;
+
+    const value = e.target.value.toLowerCase();
+    const previousValue = userAnswers[key] || '';
+    userAnswers[key] = value;
+
+    let lastInsertedIndex = -1;
+    if (value.length > previousValue.length) lastInsertedIndex = value.length - 1;
+
+    const isCorrect = value === item.word.toLowerCase();
+    const isFullyTypedWrong = !isCorrect && value.length > 0 && value.length === item.word.length;
+
+    document.getElementById('modalLetterBoxes').innerHTML = generateLetterBoxes(item.word, value, isCorrect, lastInsertedIndex, true, isFullyTypedWrong);
+    document.getElementById('cardModal').classList.toggle('correct', isCorrect);
+
+    if (isCorrect) { e.target.blur(); return; }
+
+    if (isFullyTypedWrong) {
+      const modal = document.getElementById('cardModal');
+      const wrongMark = document.getElementById('modalWrongMark');
+      modal.classList.add('wrong-shake');
+      wrongMark.classList.add('show');
+      playGentleWrongSound();
+      setTimeout(() => {
+        modal.classList.remove('wrong-shake');
+        wrongMark.classList.remove('show');
+        if (activeModalCard && activeModalCard.idx === idx && userAnswers[key] === value) {
+          userAnswers[key] = '';
+          e.target.value = '';
+          document.getElementById('modalLetterBoxes').innerHTML = generateLetterBoxes(item.word, '', false, -1, true);
+        }
+      }, 650);
+    }
+  }
+
+  function peekModal(event) {
+    event.stopPropagation();
+    if (!activeModalCard) return;
+    const { idx } = activeModalCard;
+    const item = getItems()[idx];
+    const key = `${activeTopicId}-${idx}`;
+
+    const boxes = document.querySelectorAll('#modalLetterBoxes .letter-box');
+    const peekIcon = event.target;
+
+    boxes.forEach((box, i) => { box.textContent = item.word[i]; box.classList.add('peeking'); });
+    peekIcon.style.opacity = '0';
+
+    setTimeout(() => {
+      const userAnswer = userAnswers[key] || '';
+      boxes.forEach((box, i) => { box.textContent = userAnswer[i] || ''; box.classList.remove('peeking'); });
+      peekIcon.style.opacity = '1';
+    }, 1500);
+  }
+
+  function resetModalAttempt(event) {
+    event.stopPropagation();
+    if (!activeModalCard) return;
+    const { idx } = activeModalCard;
+    const key = `${activeTopicId}-${idx}`;
+    delete userAnswers[key];
+    const item = getItems()[idx];
+
+    document.getElementById('modalLetterBoxes').innerHTML = generateLetterBoxes(item.word, '', false, -1, true);
+    document.getElementById('cardModal').classList.remove('correct');
+
+    const input = document.getElementById('modalInput');
+    input.value = '';
+    input.focus({ preventScroll: true });
+  }
+  /* ---- end expanded card modal ---- */
+
+  function showCheat(item) {
+    document.getElementById('cheatEmoji').textContent = item.emoji;
+    document.getElementById('cheatVerb').textContent = item.word;
+    document.getElementById('cheatOverlay').classList.add('show');
+    setTimeout(() => document.getElementById('cheatOverlay').classList.remove('show'), 2000);
+  }
+
+  function nextSet() {
+    const sets = getSets();
+    if (currentSetIndex < sets.length - 1) { currentSetIndex++; renderSet(); }
+  }
+  function previousSet() { if (currentSetIndex > 0) { currentSetIndex--; renderSet(); } }
+  function goToSet(idx) { currentSetIndex = idx; renderSet(); }
+
+  function updateNavButtons() {
+    const sets = getSets();
+    document.getElementById('prevBtn').disabled = currentSetIndex === 0;
+    document.getElementById('nextBtn').disabled = currentSetIndex === sets.length - 1;
+  }
+  function updateDots() {
+    document.querySelectorAll('.dot').forEach((dot, i) => dot.classList.toggle('active', i === currentSetIndex));
+  }
+
+  document.getElementById('cheatOverlay').addEventListener('click', () => {
+    document.getElementById('cheatOverlay').classList.remove('show');
+  });
+  document.getElementById('cardModalOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('cardModalOverlay')) closeCardModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.getElementById('cheatOverlay').classList.remove('show');
+      if (activeModalCard) closeCardModal();
+      else if (activeTopicId) goHome();
+      return;
+    }
+    if (currentFocusedInput !== null || activeModalCard || !activeTopicId) return;
+    const sets = getSets();
+    if (e.key === 'ArrowRight' && currentSetIndex < sets.length - 1) nextSet();
+    else if (e.key === 'ArrowLeft' && currentSetIndex > 0) previousSet();
+  });
+
+  loadData();
+</script>
+</body>
+</html></title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
